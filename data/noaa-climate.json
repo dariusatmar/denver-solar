@@ -1,0 +1,48 @@
+{
+  "description": "Denver climate data compiled from NOAA/NWS normals",
+  "sources": [
+    "currentresults.com (NOAA-derived, 1991-2020 normals)",
+    "weather.gov NWS Boulder office"
+  ],
+  "fetched": "2026-03-14",
+  "sunshine": {
+    "sunny_days": 115,
+    "partly_sunny_days": 130,
+    "total_days_with_sun": 245,
+    "percent_possible_sunshine": 69,
+    "note": "The commonly cited '300 days of sunshine' uses a more generous counting method (including any day with some sun). NOAA's strict count (mostly clear sky) is 245."
+  },
+  "temperatures_monthly_f": {
+    "description": "30-year normals, 1991-2020",
+    "months": {
+      "jan": {"high": 47, "low": 18},
+      "feb": {"high": 48, "low": 19},
+      "mar": {"high": 56, "low": 27},
+      "apr": {"high": 63, "low": 34},
+      "may": {"high": 72, "low": 43},
+      "jun": {"high": 84, "low": 53},
+      "jul": {"high": 90, "low": 59},
+      "aug": {"high": 88, "low": 57},
+      "sep": {"high": 80, "low": 48},
+      "oct": {"high": 67, "low": 36},
+      "nov": {"high": 55, "low": 26},
+      "dec": {"high": 46, "low": 18}
+    },
+    "annual": {"high": 66, "low": 37}
+  },
+  "extreme_weather_days": {
+    "days_above_90f": 42,
+    "days_above_100f": 2,
+    "days_below_32f": 62,
+    "days_below_0f": 5,
+    "note": "Cool nights and low summer heat are advantageous for solar panel efficiency"
+  },
+  "solar_relevance": {
+    "altitude_ft": 5280,
+    "altitude_m": 1609,
+    "atmosphere_above_pct": 85,
+    "humidity": "semi-arid, low humidity year-round",
+    "snow_duration": "typically melts within 1-2 days due to sunshine",
+    "panel_temp_advantage": "Summer highs rarely exceed 90°F vs 110°F+ in Phoenix. Cooler panels produce more per kWh of irradiance."
+  }
+}

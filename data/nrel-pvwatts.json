@@ -1,0 +1,37 @@
+{
+  "description": "PVWatts v8 production estimate for Denver, CO",
+  "fetched": "2026-03-14",
+  "source": "NREL PVWatts v8 API",
+  "inputs": {
+    "lat": 39.7392,
+    "lon": -104.9903,
+    "system_capacity_kw": 10,
+    "azimuth": 180,
+    "tilt": 40,
+    "array_type": "fixed_roof",
+    "module_type": "premium",
+    "losses_pct": 14
+  },
+  "station": {
+    "id": "484137",
+    "state": "Colorado",
+    "elevation_m": 1604,
+    "timezone": -7,
+    "weather_source": "NSRDB PSM V3 GOES tmy-2020 3.2.0"
+  },
+  "outputs": {
+    "ac_annual_kwh": 16524,
+    "capacity_factor_pct": 18.86,
+    "solrad_annual_kwh_m2_day": 5.87,
+    "ac_monthly_kwh": {
+      "jan": 1229, "feb": 1288, "mar": 1536, "apr": 1448,
+      "may": 1417, "jun": 1416, "jul": 1421, "aug": 1426,
+      "sep": 1447, "oct": 1379, "nov": 1308, "dec": 1207
+    },
+    "solrad_monthly_kwh_m2_day": {
+      "jan": 4.80, "feb": 5.66, "mar": 6.25, "apr": 6.33,
+      "may": 6.09, "jun": 6.45, "jul": 6.30, "aug": 6.31,
+      "sep": 6.46, "oct": 5.74, "nov": 5.40, "dec": 4.70
+    }
+  }
+}
