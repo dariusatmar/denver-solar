@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Solar City Leaderboard — NREL Data</title>
+    <meta name="description" content="Which US city gets the most solar energy? Ranking 11 major cities by real NREL Direct Normal Irradiance data.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sun: #F59E0B; --sun-light: #FCD34D; --sun-dark: #D97706;
+            --sky: #0EA5E9; --night: #0F172A; --night-mid: #1E293B;
+            --text: #F8FAFC; --text-dim: #94A3B8;
+            --green: #10B981; --gold: #F59E0B; --silver: #CBD5E1; --bronze: #D97706;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--night); color: var(--text);
+            line-height: 1.7; overflow-x: hidden; min-height: 100vh;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+        /* HEADER */
+        .header {
+            text-align: center; padding: 80px 24px 60px;
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, transparent 100%);
+        }
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900;
+            line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.03em;
+        }
+        .header h1 .gold { color: var(--sun); }
+        .header p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 24px; }
+        .data-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25);
+            color: var(--green); font-size: 0.75rem; font-weight: 600;
+            padding: 6px 14px; border-radius: 100px;
+        }
+        .back-link {
+            display: inline-block; margin-bottom: 24px;
+            color: var(--sun); text-decoration: none; font-size: 0.9rem; font-weight: 600;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* LEADERBOARD */
+        .leaderboard { padding: 0 0 80px; }
+        .lb-section-title {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.15em; color: var(--sun); margin-bottom: 24px; margin-top: 60px;
+        }
+        .lb-subtitle { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 32px; max-width: 700px; }
+
+        .lb-row {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px 20px; margin-bottom: 8px;
+            background: rgba(248, 250, 252, 0.03);
+            border: 1px solid rgba(248, 250, 252, 0.06);
+            border-radius: 12px; transition: all 0.2s;
+        }
+        .lb-row:hover { border-color: rgba(245, 158, 11, 0.2); transform: translateX(4px); }
+        .lb-row.denver {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.05);
+        }
+
+        .lb-rank {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1rem; font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+        }
+        .lb-rank.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold); }
+        .lb-rank.silver { background: rgba(203, 213, 225, 0.15); color: var(--silver); }
+        .lb-rank.bronze { background: rgba(217, 119, 6, 0.15); color: var(--bronze); }
+        .lb-rank.normal { background: rgba(248, 250, 252, 0.05); color: var(--text-dim); }
+
+        .lb-city { flex: 1; }
+        .lb-city-name { font-weight: 700; font-size: 1rem; }
+        .lb-city-meta { font-size: 0.78rem; color: var(--text-dim); }
+
+        .lb-bar-wrap { flex: 2; display: flex; align-items: center; gap: 12px; }
+        .lb-bar-track {
+            flex: 1; height: 28px; background: rgba(248, 250, 252, 0.04);
+            border-radius: 6px; overflow: hidden;
+        }
+        .lb-bar-fill {
+            height: 100%; border-radius: 6px; display: flex; align-items: center;
+            padding-left: 10px; font-size: 0.78rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace; color: var(--night);
+            transition: width 1s ease-out;
+        }
+        .lb-bar-fill.tier1 { background: linear-gradient(90deg, #F59E0B, #FCD34D); }
+        .lb-bar-fill.tier2 { background: linear-gradient(90deg, #10B981, #34D399); }
+        .lb-bar-fill.tier3 { background: linear-gradient(90deg, #0EA5E9, #38BDF8); }
+        .lb-bar-fill.tier4 { background: linear-gradient(90deg, #6366F1, #818CF8); }
+
+        .lb-value {
+            font-family: 'JetBrains Mono', monospace; font-weight: 700;
+            font-size: 0.9rem; width: 60px; text-align: right; flex-shrink: 0;
+        }
+
+        /* INSIGHTS */
+        .insights {
+            background: var(--night-mid); padding: 60px 0;
+            border-top: 1px solid rgba(248, 250, 252, 0.06);
+        }
+        .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px; }
+        .insight-card {
+            background: rgba(248, 250, 252, 0.03); border: 1px solid rgba(248, 250, 252, 0.06);
+            border-radius: 12px; padding: 24px;
+        }
+        .insight-card h3 { font-size: 1rem; margin-bottom: 8px; }
+        .insight-card p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.7; }
+        .insight-card .stat {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.5rem;
+            font-weight: 900; color: var(--sun); margin-bottom: 8px;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 40px 0; border-top: 1px solid rgba(248, 250, 252, 0.06);
+            text-align: center;
+        }
+        footer p { font-size: 0.8rem; color: var(--text-dim); }
+        footer a { color: var(--sun); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .lb-bar-wrap { display: none; }
+            .lb-value { width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="index.html" class="back-link">← Back to Denver Solar Case</a>
+    <h1>🏆 US <span class="gold">Solar City</span> Leaderboard</h1>
+    <p>Ranking America's major cities by their solar potential, using real irradiance data from NREL's Solar Resource API.</p>
+    <div class="data-badge">📡 NREL Solar Resource API · Perez-SUNY/NREL, 2012</div>
+</div>
+
+<div class="leaderboard">
+    <div class="container">
+
+        <!-- DNI RANKING -->
+        <div class="lb-section-title">Direct Normal Irradiance (DNI) — kWh/m²/day</div>
+        <p class="lb-subtitle">DNI measures direct beam sunlight — the most important component for solar electricity generation. High elevation and dry air boost DNI dramatically.</p>
+
+        <div class="lb-row">
+            <div class="lb-rank gold">1</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Las Vegas, NV</div>
+                <div class="lb-city-meta">36.2°N · 2,001 ft · Desert</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier1" style="width: 100%">7.62</div></div>
+            </div>
+            <div class="lb-value" style="color: var(--gold);">7.62</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank gold">1</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Tucson, AZ</div>
+                <div class="lb-city-meta">32.2°N · 2,389 ft · Desert</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier1" style="width: 100%">7.62</div></div>
+            </div>
+            <div class="lb-value" style="color: var(--gold);">7.62</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank bronze">3</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Albuquerque, NM</div>
+                <div class="lb-city-meta">35.1°N · 5,312 ft · High Desert</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier1" style="width: 97.8%">7.45</div></div>
+            </div>
+            <div class="lb-value" style="color: var(--bronze);">7.45</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">4</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Phoenix, AZ</div>
+                <div class="lb-city-meta">33.4°N · 1,086 ft · Desert</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier1" style="width: 96.5%">7.35</div></div>
+            </div>
+            <div class="lb-value">7.35</div>
+        </div>
+
+        <div class="lb-row denver">
+            <div class="lb-rank gold">5</div>
+            <div class="lb-city">
+                <div class="lb-city-name">⭐ Denver, CO</div>
+                <div class="lb-city-meta">39.7°N · 5,280 ft · Semi-Arid</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track" style="border: 1px solid rgba(245, 158, 11, 0.3);"><div class="lb-bar-fill tier2" style="width: 80.3%">6.12</div></div>
+            </div>
+            <div class="lb-value" style="color: var(--green);">6.12</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">6</div>
+            <div class="lb-city">
+                <div class="lb-city-name">San Diego, CA</div>
+                <div class="lb-city-meta">32.7°N · 62 ft · Mediterranean</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier3" style="width: 75.6%">5.76</div></div>
+            </div>
+            <div class="lb-value">5.76</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">7</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Los Angeles, CA</div>
+                <div class="lb-city-meta">34.1°N · 285 ft · Mediterranean</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier3" style="width: 75.1%">5.72</div></div>
+            </div>
+            <div class="lb-value">5.72</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">8</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Miami, FL</div>
+                <div class="lb-city-meta">25.8°N · 6 ft · Tropical</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier3" style="width: 66.1%">5.04</div></div>
+            </div>
+            <div class="lb-value">5.04</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">9</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Houston, TX</div>
+                <div class="lb-city-meta">29.8°N · 80 ft · Humid Subtropical</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier4" style="width: 54.5%">4.15</div></div>
+            </div>
+            <div class="lb-value">4.15</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">10</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Chicago, IL</div>
+                <div class="lb-city-meta">41.9°N · 594 ft · Continental</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier4" style="width: 48.8%">3.72</div></div>
+            </div>
+            <div class="lb-value">3.72</div>
+        </div>
+
+        <div class="lb-row">
+            <div class="lb-rank normal">11</div>
+            <div class="lb-city">
+                <div class="lb-city-name">Seattle, WA</div>
+                <div class="lb-city-meta">47.6°N · 175 ft · Oceanic</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar-track"><div class="lb-bar-fill tier4" style="width: 45.9%">3.50</div></div>
+            </div>
+            <div class="lb-value">3.50</div>
+        </div>
+
+    </div>
+</div>
+
+<!-- INSIGHTS -->
+<div class="insights">
+    <div class="container">
+        <div class="lb-section-title">Key Takeaways</div>
+        <div class="insight-grid">
+            <div class="insight-card">
+                <div class="stat">5th</div>
+                <h3>Denver's National Ranking</h3>
+                <p>Denver ranks 5th in the nation for DNI among major cities — ahead of San Diego, LA, Miami, Houston, Chicago, and Seattle. Only the desert Southwest beats it.</p>
+            </div>
+            <div class="insight-card">
+                <div class="stat">+21%</div>
+                <h3>vs. Miami</h3>
+                <p>Denver gets 21% more direct beam sunlight than Miami. People assume Florida = solar paradise, but humidity and clouds scatter Miami's sunlight significantly.</p>
+            </div>
+            <div class="insight-card">
+                <div class="stat">+7%</div>
+                <h3>vs. Los Angeles</h3>
+                <p>Denver even beats LA in DNI by 7%. The Mile High altitude and bone-dry air more than compensate for Denver's higher latitude and colder winters.</p>
+            </div>
+            <div class="insight-card">
+                <div class="stat">75%</div>
+                <h3>More than Seattle</h3>
+                <p>Denver gets 75% more direct sunlight than Seattle. For solar production, Denver's climate is in a completely different league from the Pacific Northwest.</p>
+            </div>
+            <div class="insight-card">
+                <div class="stat">5,280 ft</div>
+                <h3>The Altitude Effect</h3>
+                <p>At a mile high, Denver sits above ~15% of Earth's atmosphere. Less air = less scattering = more direct beam energy hitting panels. This is Denver's secret weapon.</p>
+            </div>
+            <div class="insight-card">
+                <div class="stat">≤ 90°F</div>
+                <h3>Temperature Advantage</h3>
+                <p>Solar panels lose ~0.4% efficiency per °C above 25°C. Phoenix hits 115°F regularly; Denver rarely exceeds 90°F. Cooler panels produce more electricity per unit of sunlight.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p>Data from <a href="https://developer.nrel.gov/docs/solar/solar-resource-v1/" target="_blank">NREL Solar Resource API</a> (Perez-SUNY/NREL, 2012). Built March 2026.</p>
+        <p style="margin-top: 8px;"><a href="index.html">← Back to The Case for Solar in Denver</a></p>
+    </div>
+</footer>
+
+</body>
+</html>
