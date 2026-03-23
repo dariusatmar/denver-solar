@@ -4,117 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solar Tracker — Denver, CO</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
     <style>
-        :root {
-            --sun: #F59E0B; --sun-light: #FCD34D; --sun-dark: #D97706;
-            --sky: #0EA5E9; --night: #0F172A; --night-mid: #1E293B;
-            --text: #F8FAFC; --text-dim: #94A3B8; --green: #10B981;
-        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--night); color: var(--text);
-            line-height: 1.7; min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fff; color: #111; line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
-        .header {
-            text-align: center; padding: 60px 24px 40px;
-            background: linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, transparent 100%);
-        }
-        .header h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 8px; }
-        .header h1 .gold { color: var(--sun); }
-        .header p { color: var(--text-dim); font-size: 1rem; }
-        .back-link {
-            display: inline-block; margin-bottom: 16px;
-            color: var(--sun); text-decoration: none; font-size: 0.9rem; font-weight: 600;
-        }
+        .container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 
-        .current-report {
-            background: rgba(248, 250, 252, 0.03); border: 1px solid rgba(248, 250, 252, 0.06);
-            border-radius: 16px; padding: 32px; margin: 32px auto; max-width: 900px;
+        /* HEADER */
+        .page-header { padding: 48px 0 40px; border-bottom: 1px solid #e5e5e5; }
+        .back-link { color: #2563eb; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .back-link:hover { text-decoration: underline; }
+        .page-header h1 {
+            font-size: 1.8rem; font-weight: 700; margin: 16px 0 12px;
+            letter-spacing: -0.02em;
+        }
+        .page-header p { color: #555; font-size: 0.95rem; }
+
+        /* TODAY'S REPORT */
+        .report-box {
+            background: #fafafa; border: 1px solid #eee;
+            border-radius: 8px; padding: 28px; margin: 32px 0;
         }
         .report-title {
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.15em; color: var(--sun); margin-bottom: 16px;
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; color: #888; margin-bottom: 16px;
         }
         .report-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
         }
-        .report-stat { text-align: center; padding: 16px; }
+        .report-stat { text-align: center; padding: 12px; }
         .report-stat .val {
-            font-size: 2rem; font-weight: 900; font-family: 'JetBrains Mono', monospace;
-            color: var(--sun); line-height: 1;
+            font-size: 1.4rem; font-weight: 700; color: #111;
+            line-height: 1; font-variant-numeric: tabular-nums;
         }
-        .report-stat .val.green { color: var(--green); }
+        .report-stat .val.green { color: #16a34a; }
         .report-stat .lbl {
-            font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;
-            letter-spacing: 0.06em; font-weight: 600; margin-top: 6px;
+            font-size: 0.7rem; color: #888; text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: 500; margin-top: 4px;
         }
 
-        /* CHART */
-        .chart-section { padding: 40px 0; }
-        .chart-card {
-            background: rgba(248, 250, 252, 0.03); border: 1px solid rgba(248, 250, 252, 0.06);
-            border-radius: 16px; padding: 32px; margin-bottom: 24px;
+        /* BASELINE GRID */
+        .section-box {
+            background: #fafafa; border: 1px solid #eee;
+            border-radius: 8px; padding: 28px; margin-bottom: 24px;
         }
-        .chart-header {
-            font-size: 0.85rem; color: var(--text-dim); font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px;
+        .section-header {
+            font-size: 0.8rem; font-weight: 600; color: #666;
+            text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px;
         }
-        canvas { width: 100% !important; height: auto !important; }
-
-        /* NREL MONTHLY BASELINE */
         .baseline-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-            gap: 8px; margin-top: 16px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+            gap: 6px;
         }
         .baseline-month {
-            text-align: center; padding: 12px 4px;
-            background: rgba(248, 250, 252, 0.03);
-            border: 1px solid rgba(248, 250, 252, 0.06);
-            border-radius: 8px;
+            text-align: center; padding: 10px 4px;
+            background: #fff; border: 1px solid #eee; border-radius: 6px;
         }
         .baseline-month .m-name {
-            font-size: 0.7rem; color: var(--text-dim); font-weight: 600;
-            text-transform: uppercase;
+            font-size: 0.68rem; color: #888; font-weight: 600; text-transform: uppercase;
         }
         .baseline-month .m-val {
-            font-family: 'JetBrains Mono', monospace; font-weight: 700;
-            font-size: 0.85rem; color: var(--sun); margin-top: 4px;
+            font-weight: 700; font-size: 0.82rem; color: #111; margin-top: 2px;
+            font-variant-numeric: tabular-nums;
         }
-        .baseline-month .m-daily {
-            font-size: 0.65rem; color: var(--text-dim);
-        }
+        .baseline-month .m-daily { font-size: 0.62rem; color: #999; }
         .baseline-month.current {
-            border-color: rgba(245, 158, 11, 0.4);
-            background: rgba(245, 158, 11, 0.08);
+            border-color: #2563eb; background: #f0f7ff;
         }
 
-        /* TABLE */
-        .log-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.85rem; }
+        /* LOG TABLE */
+        .log-table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+        }
         .log-table th {
-            text-align: left; padding: 10px 12px; color: var(--text-dim);
-            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
-            border-bottom: 1px solid rgba(248, 250, 252, 0.08);
+            text-align: left; padding: 10px 12px;
+            font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 0.06em; font-weight: 600; color: #888;
+            border-bottom: 2px solid #e5e5e5;
         }
         .log-table td {
-            padding: 10px 12px; border-bottom: 1px solid rgba(248, 250, 252, 0.04);
-            font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+            padding: 10px 12px; border-bottom: 1px solid #f0f0f0;
+            font-variant-numeric: tabular-nums; color: #333;
         }
 
+        /* FOOTER */
         footer {
-            padding: 40px 0; border-top: 1px solid rgba(248, 250, 252, 0.06);
-            text-align: center;
+            padding: 40px 0; border-top: 1px solid #e5e5e5;
+            text-align: center; margin-top: 20px;
         }
-        footer p { font-size: 0.8rem; color: var(--text-dim); }
-        footer a { color: var(--sun); text-decoration: none; }
+        footer p { font-size: 0.8rem; color: #999; }
+        footer a { color: #2563eb; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             .report-grid { grid-template-columns: repeat(3, 1fr); }
             .baseline-grid { grid-template-columns: repeat(4, 1fr); }
         }
@@ -122,16 +109,17 @@
 </head>
 <body>
 
-<div class="header">
-    <a href="index.html" class="back-link">← Denver Solar Case</a>
-    <h1>📈 Solar <span class="gold">Tracker</span></h1>
-    <p>Daily production estimates for a 10 kW system in Denver, CO</p>
+<div class="page-header">
+    <div class="container">
+        <a href="index.html" class="back-link">← Solar Economics in Denver</a>
+        <h1>Solar Tracker</h1>
+        <p>Daily production estimates for a 10 kW system in Denver, CO</p>
+    </div>
 </div>
 
 <div class="container">
 
-    <!-- TODAY'S REPORT -->
-    <div class="current-report" id="todayReport">
+    <div class="report-box" id="todayReport">
         <div class="report-title">Today's Forecast</div>
         <div class="report-grid" id="reportGrid">
             <div class="report-stat">
@@ -161,17 +149,13 @@
         </div>
     </div>
 
-    <!-- NREL MONTHLY BASELINE -->
-    <div class="chart-section">
-        <div class="chart-card">
-            <div class="chart-header">NREL PVWatts Monthly Baseline (10 kW System)</div>
-            <div class="baseline-grid" id="baselineGrid"></div>
-        </div>
+    <div class="section-box">
+        <div class="section-header">NREL PVWatts Monthly Baseline (10 kW System)</div>
+        <div class="baseline-grid" id="baselineGrid"></div>
     </div>
 
-    <!-- LOG TABLE -->
-    <div class="chart-card">
-        <div class="chart-header">Daily Log</div>
+    <div class="section-box">
+        <div class="section-header">Daily Log</div>
         <table class="log-table">
             <thead>
                 <tr>
@@ -185,8 +169,8 @@
             </thead>
             <tbody id="logBody"></tbody>
         </table>
-        <p style="margin-top: 16px; font-size: 0.78rem; color: var(--text-dim);">
-            Data logged by <code>solar-log.py</code>. Production estimates use NREL PVWatts monthly averages adjusted for daily cloud cover from Open-Meteo.
+        <p style="margin-top: 14px; font-size: 0.75rem; color: #999;">
+            Data logged by solar-log.py. Production estimates use NREL PVWatts monthly averages adjusted for daily cloud cover from Open-Meteo.
         </p>
     </div>
 
@@ -194,13 +178,12 @@
 
 <footer>
     <div class="container">
-        <p>Data: <a href="https://developer.nrel.gov/docs/solar/pvwatts/v8/" target="_blank">NREL PVWatts v8</a> + <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a></p>
-        <p style="margin-top: 8px;"><a href="index.html">← The Case for Solar in Denver</a></p>
+        <p>Data: <a href="https://developer.nrel.gov/docs/solar/pvwatts/v8/">NREL PVWatts v8</a> + <a href="https://open-meteo.com/">Open-Meteo</a></p>
+        <p style="margin-top: 8px;"><a href="index.html">← Solar Economics in Denver</a></p>
     </div>
 </footer>
 
 <script>
-    // NREL PVWatts monthly data for Denver (10kW, 40° tilt)
     const MONTHLY = {
         Jan: 1229, Feb: 1288, Mar: 1536, Apr: 1448, May: 1417, Jun: 1416,
         Jul: 1421, Aug: 1426, Sep: 1447, Oct: 1379, Nov: 1308, Dec: 1207
@@ -211,11 +194,9 @@
     };
     const MONTHS = Object.keys(MONTHLY);
 
-    // Current month
     const now = new Date();
-    const currentMonthIdx = now.getMonth(); // 0-indexed
+    const currentMonthIdx = now.getMonth();
 
-    // Render baseline grid
     const baselineGrid = document.getElementById('baselineGrid');
     MONTHS.forEach((m, i) => {
         const div = document.createElement('div');
@@ -229,16 +210,13 @@
         baselineGrid.appendChild(div);
     });
 
-    // Sample log data (embedded — in production this would load from CSV)
-    // This will be populated by the solar-log.py script
     const LOG_DATA = [
         { date: '2026-03-14', kwh: 27.3, value: 4.36, cloud: 65, temp_high: 24.1, sunshine: 10.0 }
     ];
 
-    // Render today's report
     if (LOG_DATA.length > 0) {
         const today = LOG_DATA[LOG_DATA.length - 1];
-        document.getElementById('rDate').textContent = today.date.slice(5); // MM-DD
+        document.getElementById('rDate').textContent = today.date.slice(5);
         document.getElementById('rKwh').textContent = today.kwh.toFixed(1);
         document.getElementById('rValue').textContent = '$' + today.value.toFixed(2);
         document.getElementById('rCloud').textContent = today.cloud + '%';
@@ -246,7 +224,6 @@
         document.getElementById('rSun').textContent = today.sunshine.toFixed(1);
     }
 
-    // Render log table
     const logBody = document.getElementById('logBody');
     LOG_DATA.slice().reverse().forEach(row => {
         const tr = document.createElement('tr');
