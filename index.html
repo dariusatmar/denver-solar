@@ -356,11 +356,62 @@
         }
         .sources li a { color: #2563eb; }
 
+        /* RANGE BAR (shared axis) */
+        .range-chart { display: flex; flex-direction: column; gap: 10px; }
+        .range-row { display: flex; align-items: center; gap: 12px; }
+        .range-label {
+            width: 130px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-align: right;
+            flex-shrink: 0;
+            color: #555;
+        }
+        .range-label.highlight { color: #111; font-weight: 700; }
+        .range-track {
+            flex: 1;
+            height: 28px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            position: relative;
+        }
+        .range-fill {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            min-width: 20px;
+        }
+        .range-fill.accent { background: #2563eb; }
+        .range-fill.highlight { background: #111; }
+        .range-fill.muted { background: #94a3b8; }
+        .range-fill.green { background: #16a34a; }
+        .range-fill.red { background: #dc2626; }
+        .range-axis {
+            display: flex;
+            justify-content: space-between;
+            padding-left: 142px;
+            margin-top: 8px;
+            font-size: 0.68rem;
+            color: #bbb;
+            font-variant-numeric: tabular-nums;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 640px) {
             .intro h1 { font-size: 1.7rem; }
             .metrics { grid-template-columns: 1fr 1fr; }
             .bar-label { width: 70px; font-size: 0.75rem; }
+            .range-label { width: 90px; font-size: 0.75rem; }
+            .range-axis { padding-left: 102px; }
             .chart-box, .calc-box { padding: 20px; }
             .calc-results { grid-template-columns: 1fr 1fr; }
             header nav a { margin-left: 12px; font-size: 0.8rem; }
@@ -504,37 +555,45 @@
 
         <div class="chart-box">
             <div class="chart-title">Levelized Cost of Energy — $/MWh (unsubsidized)</div>
-            <div class="bar-chart">
-                <div class="bar-row">
-                    <div class="bar-label" style="width:130px">Coal</div>
-                    <div class="bar-track"><div class="bar-fill muted" style="width: 95%">$65–152</div></div>
+            <div class="range-chart">
+                <!-- axis max = $240. left% = min/240*100, width% = (max-min)/240*100 -->
+                <div class="range-row">
+                    <div class="range-label">Gas peaker</div>
+                    <div class="range-track"><div class="range-fill red" style="left: 47.9%; width: 44.2%;">$115–221</div></div>
                 </div>
-                <div class="bar-row">
-                    <div class="bar-label" style="width:130px">Gas peaker</div>
-                    <div class="bar-track"><div class="bar-fill muted" style="width: 100%">$115–221</div></div>
+                <div class="range-row">
+                    <div class="range-label">Nuclear (new)</div>
+                    <div class="range-track"><div class="range-fill muted" style="left: 56.7%; width: 22.1%;">$136–189</div></div>
                 </div>
-                <div class="bar-row">
-                    <div class="bar-label" style="width:130px">Gas combined</div>
-                    <div class="bar-track"><div class="bar-fill muted" style="width: 55%">$39–101</div></div>
+                <div class="range-row">
+                    <div class="range-label">Coal</div>
+                    <div class="range-track"><div class="range-fill muted" style="left: 27.1%; width: 36.3%;">$65–152</div></div>
                 </div>
-                <div class="bar-row">
-                    <div class="bar-label" style="width:130px">Nuclear (new)</div>
-                    <div class="bar-track"><div class="bar-fill muted" style="width: 85%">$136–189</div></div>
+                <div class="range-row">
+                    <div class="range-label">Gas combined</div>
+                    <div class="range-track"><div class="range-fill muted" style="left: 16.3%; width: 25.8%;">$39–101</div></div>
                 </div>
-                <div class="bar-row">
-                    <div class="bar-label highlight" style="width:130px">Utility solar</div>
-                    <div class="bar-track"><div class="bar-fill accent" style="width: 40%">$24–96</div></div>
+                <div class="range-row">
+                    <div class="range-label">Onshore wind</div>
+                    <div class="range-track"><div class="range-fill accent" style="left: 10.0%; width: 21.3%;">$24–75</div></div>
                 </div>
-                <div class="bar-row">
-                    <div class="bar-label highlight" style="width:130px">Denver rooftop</div>
-                    <div class="bar-track"><div class="bar-fill highlight" style="width: 32%">~$72</div></div>
+                <div class="range-row">
+                    <div class="range-label highlight">Utility solar</div>
+                    <div class="range-track"><div class="range-fill green" style="left: 10.0%; width: 30.0%;">$24–96</div></div>
                 </div>
-                <div class="bar-row">
-                    <div class="bar-label" style="width:130px">Onshore wind</div>
-                    <div class="bar-track"><div class="bar-fill accent" style="width: 38%">$24–75</div></div>
+                <div class="range-row">
+                    <div class="range-label highlight">Denver rooftop</div>
+                    <div class="range-track"><div class="range-fill highlight" style="left: 28.8%; width: 3.3%;"></div><span style="position:absolute; left:33%; top:50%; transform:translateY(-50%); font-size:0.75rem; font-weight:600; color:#111;">~$72</span></div>
                 </div>
             </div>
-            <p class="chart-note">Utility-scale LCOE ranges from Lazard LCOE+ 2025 (unsubsidized). Denver rooftop calculated from $2.80/W installed, 1,652 kWh/kW/yr (NREL PVWatts), 25-year life, 0.5%/yr degradation, no subsidies. Retail grid rate in Denver is $160/MWh.</p>
+            <div class="range-axis">
+                <span>$0</span>
+                <span>$60</span>
+                <span>$120</span>
+                <span>$180</span>
+                <span>$240</span>
+            </div>
+            <p class="chart-note">Ranges from Lazard LCOE+ 2025 (unsubsidized). Denver rooftop (~$72/MWh) is a point estimate calculated from $2.80/W installed, 1,652 kWh/kW/yr (NREL PVWatts), 25-year life, 0.5%/yr degradation, no subsidies. Retail grid rate in Denver is $160/MWh.</p>
         </div>
 
         <h3>The cost trajectory matters</h3>
